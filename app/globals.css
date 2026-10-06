@@ -1,26 +1,128 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg-main: #EEF6F9;
+    --navy-primary: #071D2D;
+    --navy-card: #0E293E;
+    --accent-green: #24966F;
+    --accent-mint: #E2F4EE;
+    --accent-mint-hover: #D2EFE4;
+    --dark-text: #0B1D2B;
+    --secondary-text: #526370;
+    --light-surface: #E8EEF0;
+    --white: #FFFFFF;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--bg-main);
+    color: var(--dark-text);
+    font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom cursor setup for fine pointer devices */
+  @media (hover: hover) and (pointer: fine) {
+    body, body *, a, button, input, textarea, select, div, img, section {
+      cursor: none !important;
+    }
+  }
+
+  ::selection {
+    background-color: rgba(36, 150, 111, 0.25);
+    color: #071D2D;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
 }
+::-webkit-scrollbar-track {
+  background: #EEF6F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #C4D7E0;
+  border-radius: 9999px;
+  border: 2px solid #EEF6F9;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #24966F;
+}
+
+/* Hide scrollbar utility for horizontal carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Card glass shadow utility */
+.shadow-soft {
+  box-shadow: 0 14px 34px -8px rgba(7, 29, 45, 0.06), 0 4px 14px -3px rgba(7, 29, 45, 0.04);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 20px 40px -10px rgba(7, 29, 45, 0.12), 0 8px 20px -5px rgba(36, 150, 111, 0.1);
+}
+
+.shadow-navy-card {
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.35);
+}
+
+/* Smooth reveal animation classes */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-init {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Horizontal Infinite Marquee Scroll Keyframes */
+@keyframes marquee-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-left 60s linear infinite;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: marquee-right 60s linear infinite;
+}
+

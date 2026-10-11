@@ -56,7 +56,9 @@ export function CaseStudyView({ project }: CaseStudyViewProps) {
 
   // IntersectionObserver for Section Index
   useEffect(() => {
-    const sectionIds = ["sec-overview", "sec-problem-solution", "sec-features", "sec-gallery", "sec-outcome"];
+    const sectionIds = project.id === "brand-media"
+      ? ["sec-overview", "sec-features", "sec-gallery"]
+      : ["sec-overview", "sec-problem-solution", "sec-features", "sec-gallery", "sec-outcome"];
     const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
 
     if (sections.length === 0) return;
@@ -77,7 +79,7 @@ export function CaseStudyView({ project }: CaseStudyViewProps) {
 
     sections.forEach((sec) => observer.observe(sec));
     return () => observer.disconnect();
-  }, []);
+  }, [project.id]);
 
   // Keyboard navigation for Lightbox modal
   useEffect(() => {
@@ -123,13 +125,19 @@ export function CaseStudyView({ project }: CaseStudyViewProps) {
 
   const accentColor = project.accent || "#24966F";
 
-  const navIndexItems = [
-    { id: "sec-overview", label: "01 Overview" },
-    { id: "sec-problem-solution", label: "02 Problem & Solution" },
-    { id: "sec-features", label: "03 Key Features" },
-    { id: "sec-gallery", label: "04 Screens Gallery" },
-    { id: "sec-outcome", label: "05 Outcome" },
-  ];
+  const navIndexItems = project.id === "brand-media"
+    ? [
+        { id: "sec-overview", label: "01 Overview" },
+        { id: "sec-features", label: "02 Key Features" },
+        { id: "sec-gallery", label: "03 Screens Gallery" },
+      ]
+    : [
+        { id: "sec-overview", label: "01 Overview" },
+        { id: "sec-problem-solution", label: "02 Problem & Solution" },
+        { id: "sec-features", label: "03 Key Features" },
+        { id: "sec-gallery", label: "04 Screens Gallery" },
+        { id: "sec-outcome", label: "05 Outcome" },
+      ];
 
   return (
     <div className="min-h-screen bg-[#EEF6F9] text-[#0B1D2B] pt-28 sm:pt-36 pb-20 selection:bg-[#24966F]/20">
@@ -305,6 +313,7 @@ export function CaseStudyView({ project }: CaseStudyViewProps) {
             </section>
 
             {/* 3. Problem & Solution Blocks (Side-by-side cards on desktop) */}
+            {project.id !== "brand-media" && (
             <section id="sec-problem-solution" className="scroll-mt-32">
               <span className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: accentColor }}>
                 02 Problem &amp; Solution
@@ -405,12 +414,13 @@ export function CaseStudyView({ project }: CaseStudyViewProps) {
                 )}
               </div>
             </section>
+            )}
 
             {/* Key Features Grid (2-column grid of small cards) */}
             {((project.featuresList && project.featuresList.length > 0) || (project.features && project.features.length > 0)) && (
               <section id="sec-features" className="scroll-mt-32 border-t border-slate-200/80 pt-16">
                 <span className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: accentColor }}>
-                  03 Key Features
+                  {project.id === "brand-media" ? "02 Key Features" : "03 Key Features"}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D2B] mb-8 tracking-tight">
                   Core Interface Workflows
@@ -481,7 +491,7 @@ export function CaseStudyView({ project }: CaseStudyViewProps) {
             {galleryItems.length > 0 && (
               <section id="sec-gallery" className="scroll-mt-32 border-t border-slate-200/80 pt-16">
                 <span className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: accentColor }}>
-                  04 Gallery
+                  {project.id === "brand-media" ? "03 Gallery" : "04 Gallery"}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D2B] mb-8 tracking-tight">
                   High-Fidelity Interface Screens ({galleryItems.length})
@@ -522,6 +532,7 @@ export function CaseStudyView({ project }: CaseStudyViewProps) {
             )}
 
             {/* 5. Outcome & Reflection Block */}
+            {project.id !== "brand-media" && (
             <section id="sec-outcome" className="scroll-mt-32 border-t border-slate-200/80 pt-16">
               <span className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: accentColor }}>
                 05 Outcome
@@ -573,6 +584,7 @@ export function CaseStudyView({ project }: CaseStudyViewProps) {
                 </div>
               )}
             </section>
+            )}
 
             {/* 6. Next Project Card at the End */}
             <div className="border-t border-slate-200/80 pt-16">

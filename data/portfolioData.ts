@@ -1014,9 +1014,10 @@ export const EXPERIENCES: ExperienceItemData[] = [
     company: "Innovation Center Nepal (Seinxera)",
     date: "Apr 2026 – Jun 2026",
     description: [
-      "Developed high-fidelity wireframes and interactive prototypes for web and mobile client applications.",
-      "Conducted user research, affinity mapping, and usability testing to validate design concepts.",
-      "Standardized UI component libraries and visual tokens to streamline handoff to engineering.",
+      "Designed a website for Japanese company client, handling UI design form the concept to final mock ups.",
+      "Worked on modifications and improvement to SEINXERA s own company website.",
+      "Contributed to frontend development of the EMS pro ject using Next.js.",
+      "Collaborated with the development team to ensure consistency between design and implementation.",
     ],
   },
   {
@@ -1025,8 +1026,9 @@ export const EXPERIENCES: ExperienceItemData[] = [
     company: "Innovation Center Nepal (Seinxera)",
     date: "Jan 2026 – Mar 2026",
     description: [
-      "Assisted senior product designers in visual layout creation, icon crafting, and visual asset production.",
-      "Documented design system guidelines and component state specs for cross-functional alignment.",
+      "Designed the Employee Management System(EMS) in Figma.",
+      "Collaborated on user flows, wireframes, and high fidelity UI for Admin modules and employee modules.",
+      "Delivered developer-ready designs using figma dev mode.",
     ],
   },
 ];

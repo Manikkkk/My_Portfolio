@@ -512,7 +512,6 @@ export const PROJECTS: Project[] = [
     ],
     tags: ["UI/UX Design", "Web Design", "Hospitality", "Next.js", "Live Site"],
     href: "/projects/viewthali",
-    link: "https://viewthalirestaurant-website-three.vercel.app/",
     gridSpan: "col-span-1 md:col-span-6",
     overview: "Viewthali serves two very different visitors on one site: people who want food delivered tonight, and travelers deciding whether to stay overnight. Designed to convey luxury and peace, the platform blends atmospheric hero imagery with streamlined ordering and reservation workflows.",
     problem: {

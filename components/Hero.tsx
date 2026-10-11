@@ -36,7 +36,7 @@ interface ActiveBadge {
 const generateRandomBadges = (): ActiveBadge[] => {
   const count = 5 + Math.floor(Math.random() * 2); // 5 to 6 random badges
   const shuffledTools = [...ALL_STACK_TOOLS].sort(() => 0.5 - Math.random());
-  
+
   const angleStep = (2 * Math.PI) / count;
   const startAngle = Math.random() * Math.PI;
 
@@ -44,7 +44,7 @@ const generateRandomBadges = (): ActiveBadge[] => {
     const angle = startAngle + i * angleStep + (Math.random() - 0.5) * 0.35;
     // Radius from center (50%, 50%): ~44% to 52% puts center of badge cleanly around the image border
     const radius = 44 + Math.random() * 8;
-    
+
     // Convert polar coordinates to top/left percentages
     const leftPercent = 50 + Math.cos(angle) * radius;
     const topPercent = 50 + Math.sin(angle) * radius;
@@ -76,7 +76,7 @@ export function Hero() {
   const handleMouseEnter = () => {
     // 1. Temporarily hide/reset hover state so initial frame mounts invisibly
     setIsHovered(false);
-    
+
     // 2. Generate new random set of badges
     const newBadges = generateRandomBadges();
     setActiveBadges(newBadges);

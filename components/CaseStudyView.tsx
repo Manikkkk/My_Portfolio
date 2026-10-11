@@ -1,21 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Project, PERSONAL_INFO, PROJECTS } from "@/data/portfolioData";
+import { Project, PROJECTS } from "@/data/portfolioData";
 import {
   ArrowLeft,
-  ArrowUpRight,
-  CheckCircle,
-  Clock,
+  ArrowRight,
   Maximize2,
   X,
   ChevronLeft,
   ChevronRight,
   Play,
-  Sparkles,
-  Layers,
+  Pause,
+  Mail,
 } from "lucide-react";
 
 interface CaseStudyViewProps {
@@ -23,14 +21,80 @@ interface CaseStudyViewProps {
 }
 
 export function CaseStudyView({ project }: CaseStudyViewProps) {
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [selectedImgIndex, setSelectedImgIndex] = useState<number | null>(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [activeSectionId, setActiveSectionId] = useState("sec-overview");
 
-  // Find next and previous projects for quick navigation
+  // Next project for bottom navigation
   const currentIndex = PROJECTS.findIndex((p) => p.id === project.id);
-  const prevProject = PROJECTS[(currentIndex - 1 + PROJECTS.length) % PROJECTS.length];
   const nextProject = PROJECTS[(currentIndex + 1) % PROJECTS.length];
 
-  const galleryImages = project.gallery && project.gallery.length > 0 ? project.gallery : [project.image];
+  // Gallery items
+  const galleryItems = project.galleryItems && project.galleryItems.length > 0
+    ? project.galleryItems
+    : (project.gallery || [project.image]).map((imgPath, idx) => ({
+        src: imgPath,
+        alt: `${project.title} screenshot ${idx + 1}`,
+        caption: `Interface Screen ${idx + 1}`,
+        layout: (idx % 3 === 0 ? "full" : "half") as "full" | "half" | "third",
+      }));
+
+  // Reading progress scroll bar
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalHeight > 0) {
+        const progress = (window.scrollY / totalHeight) * 100;
+        setScrollProgress(Math.min(100, Math.max(0, progress)));
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // IntersectionObserver for Section Index
+  useEffect(() => {
+    const sectionIds = ["sec-overview", "sec-problem-solution", "sec-features", "sec-gallery", "sec-outcome"];
+    const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSectionId(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: "-20% 0px -50% 0px",
+        threshold: 0.1,
+      }
+    );
+
+    sections.forEach((sec) => observer.observe(sec));
+    return () => observer.disconnect();
+  }, []);
+
+  // Keyboard navigation for Lightbox modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedImgIndex === null) return;
+      if (e.key === "Escape") {
+        setSelectedImgIndex(null);
+      } else if (e.key === "ArrowRight") {
+        setSelectedImgIndex((selectedImgIndex + 1) % galleryItems.length);
+      } else if (e.key === "ArrowLeft") {
+        setSelectedImgIndex((selectedImgIndex - 1 + galleryItems.length) % galleryItems.length);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedImgIndex, galleryItems.length]);
 
   const openLightbox = (index: number) => {
     setSelectedImgIndex(index);
@@ -40,303 +104,590 @@ export function CaseStudyView({ project }: CaseStudyViewProps) {
     setSelectedImgIndex(null);
   };
 
-  const showNextImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (selectedImgIndex !== null) {
-      setSelectedImgIndex((selectedImgIndex + 1) % galleryImages.length);
+  const scrollToSection = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    const target = document.getElementById(id);
+    if (target) {
+      const offset = 100;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = target.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
     }
   };
 
-  const showPrevImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (selectedImgIndex !== null) {
-      setSelectedImgIndex((selectedImgIndex - 1 + galleryImages.length) % galleryImages.length);
-    }
-  };
+  const accentColor = project.accent || "#24966F";
+
+  const navIndexItems = [
+    { id: "sec-overview", label: "01 Overview" },
+    { id: "sec-problem-solution", label: "02 Problem & Solution" },
+    { id: "sec-features", label: "03 Key Features" },
+    { id: "sec-gallery", label: "04 Screens Gallery" },
+    { id: "sec-outcome", label: "05 Outcome" },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#EEF6F9] text-[#0B1D2B] pt-24 pb-20 px-4 sm:px-6 md:px-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Back Link */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-sm font-semibold text-[#0B1D2B] border border-slate-200/80 shadow-xs hover:border-[#24966F] hover:text-[#24966F] transition-all mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Portfolio</span>
-        </Link>
+    <div className="min-h-screen bg-[#EEF6F9] text-[#0B1D2B] pt-28 sm:pt-36 pb-20 selection:bg-[#24966F]/20">
+      {/* Reading Progress Line */}
+      <div className="fixed top-0 inset-x-0 z-50 h-1 bg-[#0B1D2B]/5">
+        <div
+          className="h-full transition-all duration-150 ease-out"
+          style={{ width: `${scrollProgress}%`, backgroundColor: accentColor }}
+        />
+      </div>
 
-        {/* Case Study Header */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-soft mb-10">
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="px-3.5 py-1 rounded-full bg-[#E2F4EE] text-[#24966F] text-xs font-semibold uppercase tracking-wider">
-              {project.category}
-            </span>
-            <span className="text-xs text-[#526370] flex items-center gap-1 font-medium">
-              <Clock className="w-3.5 h-3.5" /> 2026 UI/UX Case Study
-            </span>
-            <span className="text-xs text-[#526370] flex items-center gap-1 font-medium bg-[#EEF6F9] px-2.5 py-0.5 rounded-full border border-slate-200">
-              <Layers className="w-3.5 h-3.5 text-[#24966F]" /> {galleryImages.length} Screenshots & Assets
-            </span>
-          </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
+        {/* Mobile Sticky Section Index Chips (<1024px) */}
+        <div className="lg:hidden sticky top-20 z-40 bg-[#EEF6F9]/95 backdrop-blur-md py-2 border-y border-slate-200/80 mb-8 -mx-4 px-4 overflow-x-auto no-scrollbar flex items-center gap-2">
+          {navIndexItems.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              onClick={(e) => scrollToSection(e, item.id)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors border ${
+                activeSectionId === item.id
+                  ? "bg-[#071D2D] text-white border-transparent shadow-xs"
+                  : "bg-white text-[#526370] border-slate-200/80 hover:text-[#0B1D2B]"
+              }`}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B1D2B] tracking-tight mb-4">
-            {project.title}
-          </h1>
+        {/* STICKY SPLIT VIEW CONTAINER */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+          
+          {/* ==================== LEFT COLUMN (34% width, Sticky Desktop) ==================== */}
+          <div className="lg:col-span-4 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto no-scrollbar flex flex-col justify-between pr-0 lg:pr-2">
+            <div>
+              {/* Back Link */}
+              <Link
+                href="/#projects"
+                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#526370] hover:text-[#24966F] transition-colors mb-6 group"
+              >
+                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                <span>Back to Portfolio</span>
+              </Link>
 
-          <p className="text-base sm:text-lg text-[#526370] leading-relaxed mb-6 max-w-4xl">
-            {project.description}
-          </p>
-
-          <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
-            {project.tags.map((tag, i) => (
+              {/* Category */}
               <span
-                key={i}
-                className="px-3 py-1 rounded-full text-xs font-medium bg-[#EEF6F9] text-[#0B1D2B] border border-slate-200"
+                className="text-xs font-bold uppercase tracking-wider block mb-2"
+                style={{ color: accentColor }}
               >
-                {tag}
+                {project.category}
               </span>
-            ))}
-          </div>
-        </div>
 
-        {/* Hero Featured Asset / Video Section */}
-        {project.video ? (
-          <div className="mb-12 space-y-6">
-            <div className="bg-[#071D2D] rounded-3xl p-4 sm:p-6 border border-slate-800 shadow-2xl">
-              <div className="flex items-center gap-2 mb-4 text-white text-sm font-semibold">
-                <Play className="w-4 h-4 text-[#24966F]" />
-                <span>Interactive Prototype & Motion Showcase</span>
-              </div>
-              <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-inner">
-                <video
-                  src={project.video}
-                  controls
-                  autoPlay
-                  loop
-                  muted
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
-        ) : null}
+              {/* Project Title */}
+              <h1 className="text-3xl sm:text-4xl lg:text-4xl font-extrabold text-[#0B1D2B] tracking-tight leading-tight mb-4">
+                {project.title}
+              </h1>
 
-        {/* Featured Cover Image */}
-        <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden bg-[#071D2D] border border-slate-200 shadow-2xl mb-12 group">
-          <Image
-            src={project.image}
-            alt={project.title}
-            fill
-            className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
-            priority
-          />
-          <button
-            onClick={() => openLightbox(0)}
-            className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 px-4 py-2.5 rounded-full bg-black/70 hover:bg-[#24966F] text-white text-xs font-semibold backdrop-blur-md transition-all flex items-center gap-2 shadow-lg"
-          >
-            <Maximize2 className="w-4 h-4" />
-            <span>View High-Res</span>
-          </button>
-        </div>
-
-        {/* Detailed Sections: Overview & Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <div className="md:col-span-2 space-y-8 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-soft">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-[#0B1D2B] mb-3 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#24966F]" /> Project Overview
-              </h2>
-              <p className="text-[#526370] leading-relaxed">
-                {project.overview ||
-                  `This project was created to address key usability challenges, streamline navigation flows, and deliver a modern visual interface for ${project.title}. Designed in Figma with a focus on component consistency, responsive grids, and design system scalability.`}
+              {/* One-Line Summary */}
+              <p className="text-sm sm:text-base text-[#526370] leading-relaxed mb-6">
+                {project.summary || project.description}
               </p>
-            </div>
 
-            {project.features && project.features.length > 0 && (
-              <div>
-                <h3 className="text-lg sm:text-xl font-bold text-[#0B1D2B] mb-4">Key Design Features</h3>
-                <ul className="space-y-3 text-[#526370]">
-                  {project.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-[#24966F] flex-shrink-0 mt-0.5" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-8">
+                {project.tags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 rounded-full text-xs font-semibold bg-[#E2F4EE] text-[#24966F] border border-[#24966F]/20"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
-            )}
 
-            <div>
-              <h3 className="text-lg sm:text-xl font-bold text-[#0B1D2B] mb-3">Design System & Workflow</h3>
-              <ul className="space-y-2 text-[#526370]">
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-[#24966F] flex-shrink-0 mt-0.5" />
-                  <span><strong>Research & Discovery:</strong> Demographics, user personas, competitor heuristic review, task flow mapping.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-[#24966F] flex-shrink-0 mt-0.5" />
-                  <span><strong>Wireframing & IA:</strong> Information architecture mapping and rapid interactive low-fi wireframes.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-[#24966F] flex-shrink-0 mt-0.5" />
-                  <span><strong>High-Fidelity UI:</strong> Custom design token library, dark/light themes, pixel-perfect responsive layouts.</span>
-                </li>
-              </ul>
+              {/* Metadata List (Role, Timeline, Platform, Tools) */}
+              <div className="border-y border-slate-200/80 py-5 my-6 space-y-4">
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider block text-[#526370] mb-0.5">Role</span>
+                  <span className="text-sm font-bold text-[#0B1D2B]">
+                    {project.role || "Lead UI/UX Designer"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider block text-[#526370] mb-0.5">Timeline</span>
+                  <span className="text-sm font-bold text-[#0B1D2B]">
+                    {project.timeline || "4 Weeks"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider block text-[#526370] mb-0.5">Platform</span>
+                  <span className="text-sm font-bold text-[#0B1D2B]">
+                    {project.platform || "Web & Mobile"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider block text-[#526370] mb-0.5">Tools</span>
+                  <span className="text-sm font-bold text-[#0B1D2B]">
+                    {(project.tools || project.tags.slice(0, 3)).join(", ")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Desktop Mini Section Index */}
+              <div className="hidden lg:block my-6">
+                <span className="text-xs font-bold uppercase tracking-wider block mb-3 text-[#526370]">
+                  Case Study Index
+                </span>
+                <nav className="space-y-1.5">
+                  {navIndexItems.map((item) => (
+                    <a
+                      key={item.id}
+                      href={`#${item.id}`}
+                      onClick={(e) => scrollToSection(e, item.id)}
+                      className={`block text-xs font-semibold py-2 px-3.5 rounded-xl transition-all ${
+                        activeSectionId === item.id
+                          ? "bg-[#071D2D] text-white shadow-xs"
+                          : "text-[#526370] hover:text-[#0B1D2B] hover:bg-white/60"
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                </nav>
+              </div>
             </div>
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <div className="bg-[#071D2D] text-white p-6 rounded-3xl border border-slate-800 shadow-lg">
-              <h3 className="font-bold text-lg mb-1">Designer</h3>
-              <p className="text-slate-300 text-sm mb-4">{PERSONAL_INFO.name}</p>
-
-              <h3 className="font-bold text-lg mb-1">Role</h3>
-              <p className="text-slate-300 text-sm mb-4">Lead UI/UX Designer</p>
-
-              <h3 className="font-bold text-lg mb-1">Tools & Platform</h3>
-              <p className="text-slate-300 text-sm mb-6">{project.tags.slice(0, 3).join(", ")}</p>
-
+            {/* Left Panel Contact Link */}
+            <div className="pt-6 border-t border-slate-200/80 mt-6">
               <a
-                href={`mailto:${PERSONAL_INFO.email}?subject=Inquiry regarding ${project.title}`}
-                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#24966F] text-white font-semibold text-sm hover:bg-[#1E7D5C] transition-colors"
+                href="mailto:manikshrestha452@gmail.com"
+                className="inline-flex items-center gap-2 text-xs font-bold text-[#0B1D2B] hover:text-[#24966F] transition-colors"
               >
-                <span>Inquire About Project</span>
-                <ArrowUpRight className="w-4 h-4" />
+                <Mail className="w-3.5 h-3.5 text-[#24966F]" />
+                <span>Contact me regarding this project</span>
               </a>
             </div>
           </div>
-        </div>
 
-        {/* Full Image Gallery Showcase */}
-        {galleryImages.length > 0 && (
-          <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-soft mb-12">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+
+          {/* ==================== RIGHT COLUMN (66% width, Scrolling Story) ==================== */}
+          <div className="lg:col-span-8 space-y-16 md:space-y-24">
+            
+            {/* 1. Cover Image or Video */}
+            <div className="relative w-full aspect-[16/10] rounded-[24px] overflow-hidden bg-white border border-slate-200/80 shadow-soft group">
+              <Image
+                src={project.cover || project.image}
+                alt={project.title}
+                fill
+                className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                priority
+              />
+              <button
+                onClick={() => openLightbox(0)}
+                className="absolute bottom-4 right-4 px-4 py-2 rounded-full bg-[#071D2D]/90 hover:bg-[#071D2D] text-white text-xs font-semibold backdrop-blur-md transition-all flex items-center gap-2 border border-slate-700/60 shadow-md"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span>View High-Res</span>
+              </button>
+            </div>
+
+            {/* 2. Overview Block */}
+            <section id="sec-overview" className="scroll-mt-32">
+              <span className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: accentColor }}>
+                01 Overview
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D2B] mb-6 tracking-tight">
+                Project Overview
+              </h2>
+              <p className="text-base sm:text-lg text-[#526370] leading-relaxed max-w-[65ch] mb-8">
+                {project.overview || project.description}
+              </p>
+            </section>
+
+            {/* 3. Problem & Solution Blocks (Side-by-side cards on desktop) */}
+            <section id="sec-problem-solution" className="scroll-mt-32">
+              <span className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: accentColor }}>
+                02 Problem &amp; Solution
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D2B] mb-8 tracking-tight">
+                Challenges &amp; Strategic Solution
+              </h2>
+
+              {/* Problem Section */}
+              <div className="mb-8">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#526370] block mb-4">
+                  The Challenge
+                </h3>
+                
+                {typeof project.problem === 'string' ? (
+                  // Simple string problem (existing format)
+                  <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
+                    <p className="text-sm sm:text-base text-[#526370] leading-relaxed">
+                      {project.problem}
+                    </p>
+                  </div>
+                ) : project.problem ? (
+                  // Structured problem with intro + points
+                  <div className="space-y-6">
+                    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
+                      <p className="text-sm sm:text-base text-[#526370] leading-relaxed">
+                        {project.problem.intro}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {project.problem.points.map((point, idx) => (
+                        <div 
+                          key={idx} 
+                          className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 hover:border-red-400/40 transition-colors"
+                        >
+                          <h4 className="text-lg font-bold text-[#0B1D2B] mb-3 tracking-tight">
+                            {point.heading}
+                          </h4>
+                          <p className="text-sm text-[#526370] leading-relaxed">
+                            {point.detail}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
+                    <p className="text-sm sm:text-base text-[#526370] leading-relaxed">
+                      [ADD: problem statement — Legacy LMS portals suffer from fragmented navigation, high cognitive load, and poor mobile responsiveness during multi-module online study]
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Solution Section */}
               <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D2B] tracking-tight">
-                  Design Gallery & UI Screens
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#24966F] block mb-4">
+                  The Approach
+                </h3>
+                
+                {typeof project.solution === 'string' ? (
+                  // Simple string solution (existing format)
+                  <div className="bg-[#E2F4EE]/70 rounded-2xl border border-[#24966F]/30 shadow-xs p-6 sm:p-8">
+                    <p className="text-sm sm:text-base text-[#0B1D2B] leading-relaxed font-semibold">
+                      {project.solution}
+                    </p>
+                  </div>
+                ) : project.solution ? (
+                  // Structured solution with intro + points
+                  <div className="space-y-6">
+                    <div className="bg-[#E2F4EE]/70 rounded-2xl border border-[#24966F]/30 shadow-xs p-6 sm:p-8">
+                      <p className="text-sm sm:text-base text-[#0B1D2B] leading-relaxed font-semibold">
+                        {project.solution.intro}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {project.solution.points.map((point, idx) => (
+                        <div 
+                          key={idx} 
+                          className="bg-white rounded-2xl border border-[#24966F]/30 shadow-xs p-6 hover:border-[#24966F]/60 transition-colors"
+                        >
+                          <h4 className="text-lg font-bold text-[#0B1D2B] mb-3 tracking-tight">
+                            {point.heading}
+                          </h4>
+                          <p className="text-sm text-[#526370] leading-relaxed">
+                            {point.detail}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-[#E2F4EE]/70 rounded-2xl border border-[#24966F]/30 shadow-xs p-6 sm:p-8">
+                    <p className="text-sm sm:text-base text-[#0B1D2B] leading-relaxed font-semibold">
+                      A unified dashboard architecture featuring filtered category carousels, progress milestone widgets, and high-contrast WCAG AA theme tokens optimized for long study sessions.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Key Features Grid (2-column grid of small cards) */}
+            {((project.featuresList && project.featuresList.length > 0) || (project.features && project.features.length > 0)) && (
+              <section id="sec-features" className="scroll-mt-32 border-t border-slate-200/80 pt-16">
+                <span className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: accentColor }}>
+                  03 Key Features
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D2B] mb-8 tracking-tight">
+                  Core Interface Workflows
                 </h2>
-                <p className="text-sm text-[#526370] mt-1">
-                  Explore full-resolution mockups, screens, and wireframe assets uploaded for this project ({galleryImages.length} items).
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {project.featuresList ? (
+                    project.featuresList.map((ft, idx) => (
+                      <div key={idx} className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 flex flex-col justify-between hover:border-[#24966F]/40 transition-colors">
+                        <div>
+                          <span className="text-xs font-bold text-[#24966F] block mb-2">
+                            {ft.number || String(idx + 1).padStart(2, "0")}
+                          </span>
+                          <h3 className="text-lg font-bold text-[#0B1D2B] mb-2 tracking-tight">
+                            {ft.title}
+                          </h3>
+                          <p className="text-sm text-[#526370] leading-relaxed">
+                            {ft.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    project.features?.map((ftText, idx) => (
+                      <div key={idx} className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 hover:border-[#24966F]/40 transition-colors">
+                        <span className="text-xs font-bold text-[#24966F] block mb-2">
+                          {String(idx + 1).padStart(2, "0")}
+                        </span>
+                        <p className="text-sm text-[#0B1D2B] font-semibold leading-relaxed">
+                          {ftText}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </section>
+            )}
+
+            {/* Video Showcase (if present) */}
+            {project.video && (
+              <div className="border-t border-slate-200/80 pt-16">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#24966F]">
+                    Interactive Prototype
+                  </span>
+                  <button
+                    onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+                    className="px-4 py-2 rounded-full border border-slate-200 bg-white text-xs font-bold text-[#0B1D2B] hover:bg-[#EEF6F9] hover:text-[#24966F] shadow-xs flex items-center gap-2 transition-all cursor-pointer"
+                  >
+                    {isVideoPlaying ? <Pause className="w-3.5 h-3.5 text-[#24966F]" /> : <Play className="w-3.5 h-3.5 text-[#24966F]" />}
+                    <span>{isVideoPlaying ? "Pause Video" : "Play Prototype"}</span>
+                  </button>
+                </div>
+                <div className="relative aspect-video rounded-[20px] overflow-hidden bg-[#071D2D] border border-slate-700/60 shadow-md">
+                  <video
+                    src={project.video}
+                    controls={isVideoPlaying}
+                    autoPlay={false}
+                    loop
+                    muted
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* 4. Screens Gallery */}
+            {galleryItems.length > 0 && (
+              <section id="sec-gallery" className="scroll-mt-32 border-t border-slate-200/80 pt-16">
+                <span className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: accentColor }}>
+                  04 Gallery
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D2B] mb-8 tracking-tight">
+                  High-Fidelity Interface Screens ({galleryItems.length})
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {galleryItems.map((item, idx) => {
+                    const isFullWidth = item.layout === "full" || idx === 0;
+                    return (
+                      <div
+                        key={idx}
+                        className={`group ${isFullWidth ? "md:col-span-2" : "md:col-span-1"}`}
+                      >
+                        <div
+                          onClick={() => openLightbox(idx)}
+                          className="relative aspect-[16/10] rounded-[20px] overflow-hidden bg-white border border-slate-200/80 shadow-xs cursor-pointer transition-all duration-300 hover:border-[#24966F]/50 hover:shadow-soft"
+                        >
+                          <Image
+                            src={item.src}
+                            alt={item.alt}
+                            fill
+                            className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                            sizes="(max-width: 768px) 100vw, 800px"
+                          />
+                          <div className="absolute top-3 right-3 p-2 rounded-full bg-[#071D2D]/80 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Maximize2 className="w-3.5 h-3.5" />
+                          </div>
+                        </div>
+                        {/* Descriptive Caption Below Screen */}
+                        <p className="text-xs text-[#526370] font-semibold mt-2.5 px-1">
+                          {item.caption}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* 5. Outcome & Reflection Block */}
+            <section id="sec-outcome" className="scroll-mt-32 border-t border-slate-200/80 pt-16">
+              <span className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: accentColor }}>
+                05 Outcome
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D2B] mb-6 tracking-tight">
+                Outcome &amp; Reflection
+              </h2>
+              
+              {typeof project.outcome === 'string' ? (
+                // Simple string outcome (existing format)
+                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
+                  <p className="text-base sm:text-lg text-[#526370] leading-relaxed max-w-[65ch]">
+                    {project.outcome}
+                  </p>
+                </div>
+              ) : project.outcome ? (
+                // Structured outcome with intro + points
+                <div className="space-y-6">
+                  {/* Intro text */}
+                  <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
+                    <p className="text-base sm:text-lg text-[#526370] leading-relaxed max-w-[65ch]">
+                      {project.outcome.intro}
+                    </p>
+                  </div>
+
+                  {/* Outcome points grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {project.outcome.points.map((point, idx) => (
+                      <div 
+                        key={idx} 
+                        className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 hover:border-[#24966F]/40 transition-colors"
+                      >
+                        <h3 className="text-lg font-bold text-[#0B1D2B] mb-3 tracking-tight">
+                          {point.heading}
+                        </h3>
+                        <p className="text-sm text-[#526370] leading-relaxed">
+                          {point.detail}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                // Fallback if no outcome provided
+                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
+                  <p className="text-base sm:text-lg text-[#526370] leading-relaxed max-w-[65ch]">
+                    [ADD: outcome & reflection — Metrics on student retention, component system adoption, and instructor satisfaction feedback]
+                  </p>
+                </div>
+              )}
+            </section>
+
+            {/* 6. Next Project Card at the End */}
+            <div className="border-t border-slate-200/80 pt-16">
+              <span className="text-xs font-bold uppercase tracking-wider block mb-4 text-[#526370]">
+                Next Case Study
+              </span>
+
+              <Link
+                href={nextProject.href}
+                className="group block bg-white rounded-2xl border border-slate-200/80 shadow-soft hover:border-[#24966F]/40 transition-all duration-300 mb-12 overflow-hidden"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center p-6 sm:p-8">
+                  <div className="sm:col-span-7 space-y-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#24966F] block">
+                      {nextProject.category}
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-[#0B1D2B] group-hover:text-[#24966F] transition-colors tracking-tight">
+                      {nextProject.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#526370] leading-relaxed line-clamp-2">
+                      {nextProject.description}
+                    </p>
+                    <div className="pt-2 flex items-center gap-2 text-xs font-bold text-[#0B1D2B] group-hover:text-[#24966F]">
+                      <span>Explore Next Case Study</span>
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1 text-[#24966F]" />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-5">
+                    <div className="relative aspect-[16/10] rounded-[16px] overflow-hidden bg-[#071D2D] border border-slate-200/60">
+                      <Image
+                        src={nextProject.image}
+                        alt={nextProject.title}
+                        fill
+                        className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                        sizes="300px"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+
+              {/* Short closing line with email link */}
+              <div className="text-center pt-6 border-t border-slate-200/80">
+                <p className="text-sm text-[#526370]">
+                  Interested in this project or looking to collaborate?{" "}
+                  <a
+                    href="mailto:manikshrestha452@gmail.com"
+                    className="font-bold text-[#0B1D2B] hover:text-[#24966F] underline transition-colors"
+                  >
+                    manikshrestha452@gmail.com
+                  </a>
                 </p>
               </div>
             </div>
 
-            {/* Responsive Masonry / Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {galleryImages.map((imgPath, idx) => {
-                const fileName = imgPath.split("/").pop() || `Screen ${idx + 1}`;
-                return (
-                  <div
-                    key={idx}
-                    onClick={() => openLightbox(idx)}
-                    className="group relative cursor-pointer aspect-[16/10] rounded-2xl overflow-hidden bg-[#071D2D] border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-                  >
-                    <Image
-                      src={imgPath}
-                      alt={`${project.title} screenshot ${idx + 1}`}
-                      fill
-                      className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-
-                    {/* Overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-white">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold truncate pr-2">{fileName}</span>
-                        <span className="p-1.5 rounded-full bg-[#24966F] text-white">
-                          <Maximize2 className="w-3.5 h-3.5" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
-        )}
-
-        {/* Project Navigation (Prev / Next) */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-slate-200">
-          <Link
-            href={prevProject.href}
-            className="w-full sm:w-auto inline-flex items-center justify-start gap-3 p-4 rounded-2xl bg-white border border-slate-200 text-[#0B1D2B] hover:border-[#24966F] hover:text-[#24966F] transition-all"
-          >
-            <ArrowLeft className="w-5 h-5 text-[#24966F]" />
-            <div className="text-left">
-              <span className="text-xs text-[#526370] block">Previous Project</span>
-              <span className="font-bold text-sm">{prevProject.title}</span>
-            </div>
-          </Link>
-
-          <Link
-            href={nextProject.href}
-            className="w-full sm:w-auto inline-flex items-center justify-end gap-3 p-4 rounded-2xl bg-white border border-slate-200 text-[#0B1D2B] hover:border-[#24966F] hover:text-[#24966F] transition-all"
-          >
-            <div className="text-right">
-              <span className="text-xs text-[#526370] block">Next Project</span>
-              <span className="font-bold text-sm">{nextProject.title}</span>
-            </div>
-            <ArrowUpRight className="w-5 h-5 text-[#24966F]" />
-          </Link>
         </div>
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Lightbox Modal with Arrow Navigation & Esc Close */}
       {selectedImgIndex !== null && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-[#071D2D]/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
           onClick={closeLightbox}
         >
-          {/* Close Button */}
           <button
             onClick={closeLightbox}
-            className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-50 focus:outline-none"
+            className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-50 focus:outline-none cursor-pointer"
             aria-label="Close modal"
           >
             <X className="w-6 h-6" />
           </button>
 
-          {/* Previous Button */}
-          {galleryImages.length > 1 && (
+          {galleryItems.length > 1 && (
             <button
-              onClick={showPrevImage}
-              className="absolute left-4 sm:left-8 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-50 focus:outline-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImgIndex((selectedImgIndex - 1 + galleryItems.length) % galleryItems.length);
+              }}
+              className="absolute left-4 sm:left-8 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-50 focus:outline-none cursor-pointer"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-8 h-8" />
             </button>
           )}
 
-          {/* Next Button */}
-          {galleryImages.length > 1 && (
+          {galleryItems.length > 1 && (
             <button
-              onClick={showNextImage}
-              className="absolute right-4 sm:right-8 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-50 focus:outline-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImgIndex((selectedImgIndex + 1) % galleryItems.length);
+              }}
+              className="absolute right-4 sm:left-auto sm:right-8 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-50 focus:outline-none cursor-pointer"
               aria-label="Next image"
             >
               <ChevronRight className="w-8 h-8" />
             </button>
           )}
 
-          {/* Modal Content */}
           <div
             className="relative max-w-6xl max-h-[85vh] w-full h-full flex flex-col items-center justify-center p-2"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative w-full h-full rounded-[16px] overflow-hidden">
               <Image
-                src={galleryImages[selectedImgIndex]}
-                alt={`${project.title} view ${selectedImgIndex + 1}`}
+                src={galleryItems[selectedImgIndex].src}
+                alt={galleryItems[selectedImgIndex].alt}
                 fill
                 className="object-contain"
                 priority
               />
             </div>
-            <div className="mt-4 text-slate-300 text-sm font-medium bg-black/60 px-4 py-1.5 rounded-full border border-slate-800">
-              Image {selectedImgIndex + 1} of {galleryImages.length} —{" "}
-              {galleryImages[selectedImgIndex].split("/").pop()}
+            <div className="mt-4 text-xs font-semibold text-white/90 bg-[#071D2D]/80 px-4 py-1.5 rounded-full border border-slate-700/80 shadow-md">
+              {selectedImgIndex + 1} / {galleryItems.length} — {galleryItems[selectedImgIndex].caption}
             </div>
           </div>
         </div>

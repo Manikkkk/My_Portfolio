@@ -115,7 +115,8 @@ export function CustomCursor() {
   return (
     <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden select-none">
       {/* Spider-Man Center Pointer Icon */}
-      <div
+      <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden select-none"></div>
+      {/* <div
         ref={dotRef}
         className="fixed top-0 left-0 -ml-3 -mt-3 flex items-center justify-center pointer-events-none transition-opacity duration-200"
         style={{
@@ -131,10 +132,9 @@ export function CustomCursor() {
           viewBox="0 0 24 24"
           fill="currentColor"
         >
-          {/* Spider Emblem SVG */}
           <path d="M12 2C11.5 2 11 3.5 11 4.5C11 5.5 11.5 6 12 6C12.5 6 13 5.5 13 4.5C13 3.5 12.5 2 12 2ZM12 7.5C10.5 7.5 9.5 9 9.5 11C9.5 12.5 10.5 14 12 14C13.5 14 14.5 12.5 14.5 11C14.5 9 13.5 7.5 12 7.5ZM6 6.5L9 9.5M18 6.5L15 9.5M4 11H8.5M20 11H15.5M5 16L8.5 13.5M19 16L15.5 13.5M7 21.5L10 16.5M17 21.5L14 16.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-      </div>
+      </div> */}
     </div>
   );
 }

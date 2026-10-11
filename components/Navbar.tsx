@@ -55,9 +55,8 @@ export function Navbar() {
   return (
     <header className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 md:px-8 pointer-events-none">
       <nav
-        className={`pointer-events-auto flex items-center justify-between w-full max-w-6xl px-4 py-2.5 sm:px-6 sm:py-3 rounded-full bg-white/90 backdrop-blur-md border border-slate-200/70 shadow-soft transition-all duration-300 ${
-          scrolled ? "shadow-lg bg-white/95 border-slate-300/80 py-2 sm:py-2.5" : ""
-        }`}
+        className={`pointer-events-auto flex items-center justify-between w-full max-w-6xl px-4 py-2.5 sm:px-6 sm:py-3 rounded-full bg-white/90 backdrop-blur-md border border-slate-200/70 shadow-soft transition-all duration-300 ${scrolled ? "shadow-lg bg-white/95 border-slate-300/80 py-2 sm:py-2.5" : ""
+          }`}
         aria-label="Main Navigation"
       >
         {/* Profile Avatar & Name */}
@@ -87,11 +86,10 @@ export function Navbar() {
             <li key={item.id}>
               <Link
                 href={item.href}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 block ${
-                  activeSection === item.id
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 block ${activeSection === item.id
                     ? "bg-white text-[#24966F] shadow-sm font-semibold"
                     : "text-[#526370] hover:text-[#0B1D2B] hover:bg-white/50"
-                }`}
+                  }`}
                 data-cursor="hover"
               >
                 {item.label}

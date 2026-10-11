@@ -24,11 +24,21 @@
   }
 
   /* Custom cursor setup for fine pointer devices */
-  @media (hover: hover) and (pointer: fine) {
-    body, body *, a, button, input, textarea, select, div, img, section {
+  /* @media (hover: hover) and (pointer: fine) {
+
+    body,
+    body *,
+    a,
+    button,
+    input,
+    textarea,
+    select,
+    div,
+    img,
+    section {
       cursor: none !important;
     }
-  }
+  } */
 
   ::selection {
     background-color: rgba(36, 150, 111, 0.25);
@@ -41,14 +51,17 @@
   width: 10px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: #EEF6F9;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #C4D7E0;
   border-radius: 9999px;
   border: 2px solid #EEF6F9;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #24966F;
 }
@@ -57,6 +70,7 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -100,6 +114,7 @@
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -109,6 +124,7 @@
   0% {
     transform: translateX(-50%);
   }
+
   100% {
     transform: translateX(0%);
   }
@@ -125,4 +141,3 @@
   width: max-content;
   animation: marquee-right 60s linear infinite;
 }
-

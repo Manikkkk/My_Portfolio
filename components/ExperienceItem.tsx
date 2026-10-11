@@ -13,11 +13,10 @@ interface ExperienceItemProps {
 export function ExperienceItem({ item, isOpen, onToggle }: ExperienceItemProps) {
   return (
     <div
-      className={`rounded-2xl sm:rounded-3xl transition-all duration-300 ${
-        isOpen
+      className={`rounded-2xl sm:rounded-3xl transition-all duration-300 ${isOpen
           ? "bg-white shadow-soft"
           : "bg-white/70 hover:bg-white shadow-xs"
-      } overflow-hidden`}
+        } overflow-hidden`}
     >
       {/* Header Button */}
       <button
@@ -28,11 +27,10 @@ export function ExperienceItem({ item, isOpen, onToggle }: ExperienceItemProps) 
       >
         <div className="flex items-start sm:items-center gap-4">
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-              isOpen
+            className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${isOpen
                 ? "bg-[#24966F] text-white"
                 : "bg-[#E2F4EE] text-[#24966F]"
-            }`}
+              }`}
           >
             <Briefcase className="w-5 h-5" />
           </div>
@@ -56,9 +54,8 @@ export function ExperienceItem({ item, isOpen, onToggle }: ExperienceItemProps) 
           </div>
 
           <span
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-[#526370] transition-transform duration-300 ${
-              isOpen ? "rotate-180 bg-[#EEF6F9] text-[#24966F]" : ""
-            }`}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-[#526370] transition-transform duration-300 ${isOpen ? "rotate-180 bg-[#EEF6F9] text-[#24966F]" : ""
+              }`}
           >
             <ChevronDown className="w-5 h-5" />
           </span>

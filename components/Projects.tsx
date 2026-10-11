@@ -37,19 +37,17 @@ export function Projects() {
                   data-cursor-image={project.image}
                   onMouseEnter={() => setActiveIndex(index)}
                   onFocus={() => setActiveIndex(index)}
-                  className={`group block w-full text-left border-b border-white/10 py-6 px-4 transition-all duration-500 motion-reduce:transition-none ${
-                    isActive
+                  className={`group block w-full text-left border-b border-white/10 py-6 px-4 transition-all duration-500 motion-reduce:transition-none ${isActive
                       ? "translate-x-4 opacity-100"
                       : "translate-x-0 opacity-50 hover:opacity-70"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <div className="flex items-start gap-6 flex-1">
                       {/* Number */}
                       <span
-                        className={`text-5xl font-bold transition-colors duration-500 motion-reduce:transition-none ${
-                          isActive ? "text-cyan-400" : "text-white/30"
-                        }`}
+                        className={`text-5xl font-bold transition-colors duration-500 motion-reduce:transition-none ${isActive ? "text-cyan-400" : "text-white/30"
+                          }`}
                       >
                         {number}
                       </span>
@@ -57,20 +55,18 @@ export function Projects() {
                       {/* Title & Description */}
                       <div className="flex-1 pt-1">
                         <h3
-                          className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
-                            isActive ? "text-white" : "text-white/70"
-                          }`}
+                          className={`text-2xl font-bold mb-2 transition-colors duration-300 ${isActive ? "text-white" : "text-white/70"
+                            }`}
                         >
                           {project.title}
                         </h3>
 
                         {/* Description - expands on active */}
                         <div
-                          className={`overflow-hidden transition-all duration-500 motion-reduce:transition-none ${
-                            isActive
+                          className={`overflow-hidden transition-all duration-500 motion-reduce:transition-none ${isActive
                               ? "max-h-40 opacity-100"
                               : "max-h-0 opacity-0"
-                          }`}
+                            }`}
                         >
                           <p className="text-slate-300 leading-relaxed">
                             {project.description}
@@ -82,16 +78,14 @@ export function Projects() {
                     {/* Right: Category & Arrow */}
                     <div className="flex items-center gap-4 flex-shrink-0">
                       <span
-                        className={`text-sm font-medium transition-colors duration-300 ${
-                          isActive ? "text-cyan-400" : "text-white/50"
-                        }`}
+                        className={`text-sm font-medium transition-colors duration-300 ${isActive ? "text-cyan-400" : "text-white/50"
+                          }`}
                       >
                         {project.category}
                       </span>
                       <ArrowUpRight
-                        className={`w-6 h-6 transition-colors duration-300 ${
-                          isActive ? "text-cyan-400" : "text-white/30"
-                        }`}
+                        className={`w-6 h-6 transition-colors duration-300 ${isActive ? "text-cyan-400" : "text-white/30"
+                          }`}
                       />
                     </div>
                   </div>
@@ -114,11 +108,10 @@ export function Projects() {
                   return (
                     <div
                       key={project.id}
-                      className={`absolute inset-0 transition-all duration-700 motion-reduce:transition-none ${
-                        isActive
+                      className={`absolute inset-0 transition-all duration-700 motion-reduce:transition-none ${isActive
                           ? "opacity-100 scale-100"
                           : "opacity-0 scale-95"
-                      }`}
+                        }`}
                     >
                       <Image
                         src={project.image}

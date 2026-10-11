@@ -31,7 +31,7 @@ export function CTA() {
           </p>
 
           <Button
-            href="mailto:manikshrestha.ux@gmail.com"
+            href="mailto:manikshrestha452@gmail.com"
             variant="accent"
             size="lg"
             icon="arrow"

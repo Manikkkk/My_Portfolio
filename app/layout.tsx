@@ -11,7 +11,7 @@ const fontSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Manik Shrestha — UI/UX Designer",
+  title: "Manik's Portfolio",
   description:
     "Manik Shrestha is a UI/UX designer creating intuitive, modern and user-centered digital experiences.",
   keywords: [
@@ -24,6 +24,9 @@ export const metadata: Metadata = {
     "Web Design",
   ],
   authors: [{ name: "Manik Shrestha" }],
+  icons: {
+    icon: "/assets/image/VR.png",
+  },
   openGraph: {
     title: "Manik Shrestha — UI/UX Designer Portfolio",
     description:

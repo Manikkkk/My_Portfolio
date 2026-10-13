@@ -1,7 +1,7 @@
 import { Hero } from "@/components/Hero";
 import { FeaturedWork } from "@/components/FeaturedWork";
 import { DesignToolkit } from "@/components/DesignToolkit";
-import { Projects } from "@/components/Projects";
+import { FloatingProjects } from "@/components/FloatingProjects";
 import { Experience } from "@/components/Experience";
 import { About } from "@/components/About";
 import { CTA } from "@/components/CTA";
@@ -19,8 +19,8 @@ export default function Home() {
       {/* Design Toolkit Tech Stack */}
       <DesignToolkit />
 
-      {/* Selected Projects (Dark Navy Section) */}
-      <Projects />
+      {/* Selected Projects (Floating Canvas Section) */}
+      <FloatingProjects />
 
       {/* Experience Accordion with Wave Transition */}
       <Experience />

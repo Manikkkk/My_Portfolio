@@ -72,7 +72,7 @@ const FLOATING_PROJECTS: FloatingProject[] = [
     title: "Visual media and motion concepts",
     category: "3d design",
     href: "/projects/brand-media",
-    image: "/assets/image/main.png",
+    image: "/assets/image/Main.png",
     x: 71,
     y: 55,
     width: 24,
@@ -97,11 +97,11 @@ function FloatingCard({
   // Calculate push away effect when another card is hovered
   const getPushAwayTransform = () => {
     if (!hoveredId || hoveredId === project.id) return { x: 0, y: 0 };
-    
+
     // Simple push away logic - you can adjust these values
     const dx = project.x > 50 ? -8 : 8; // Push left or right based on position
     const dy = project.y > 50 ? -6 : 6; // Push up or down based on position
-    
+
     return { x: dx, y: dy };
   };
 
@@ -110,13 +110,13 @@ function FloatingCard({
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ 
-        opacity: 1, 
+      animate={{
+        opacity: 1,
         scale: hoveredId && hoveredId !== project.id ? 0.95 : 1,
         x: hoveredId ? pushAway.x : 0,
         y: hoveredId ? pushAway.y : 0,
       }}
-      transition={{ 
+      transition={{
         duration: 0.3,
         ease: "easeOut"
       }}

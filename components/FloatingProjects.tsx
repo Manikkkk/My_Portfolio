@@ -14,6 +14,7 @@ interface FloatingProject {
   x: number; // percentage for left position
   y: number; // percentage for top position
   width: number; // percentage width
+  aspectRatio?: string;
 }
 
 const FLOATING_PROJECTS: FloatingProject[] = [
@@ -22,60 +23,66 @@ const FLOATING_PROJECTS: FloatingProject[] = [
     title: "LearnAxis Platform",
     category: "EdTech",
     href: "/projects/learnaxis",
-    image: "/assets/image/LearnAxis/main.png",
-    x: 5,
-    y: 5,
+    image: "/assets/image/LearnAxis/learnaxis laptop view.png",
+    x: 10,
+    y: 2,
     width: 24,
+    aspectRatio: "1439 / 1030",
   },
   {
     id: "bl-party",
     title: "BL Party Palace",
     category: "Venue Booking",
     href: "/projects/bl-party-palace",
-    image: "/assets/image/BL Party Palace/dashboard.png",
+    image: "/assets/image/BL Party Palace/laptop preview BL.png",
     x: 38,
-    y: 15,
+    y: 3,
     width: 24,
+    aspectRatio: "1639 / 1030",
   },
   {
     id: "viewthali",
     title: "Viewthali Resort",
     category: "Hospitality",
     href: "/projects/viewthali",
-    image: "/assets/image/Viewthali/second.png",
-    x: 71,
+    image: "/assets/image/Viewthali/viewthali preview.png",
+    x: 65,
     y: 5,
     width: 24,
+    aspectRatio: "1296 / 818",
   },
   {
     id: "movie-ticket",
     title: "BSR Movie Booking",
     category: "Entertainment",
     href: "/projects/movie-ticket",
-    image: "/assets/image/BSR Movie Ticket Booking/movie ticket webpage.png",
-    x: 5,
-    y: 55,
+    image: "/assets/image/BSR Movie Ticket Booking/BSR movie preview.png",
+    x: 10,
+    y: 40,
     width: 24,
+    aspectRatio: "980 / 734",
   },
   {
     id: "sneaker",
     title: "Sneaker E-Commerce",
     category: "E-Commerce",
     href: "/projects/sneaker-ecommerce",
-    image: "/assets/image/E-commerce shoes/shoes first page.png",
+    image: "/assets/image/E-commerce shoes/sneaker shoes.png",
     x: 38,
-    y: 65,
+    y: 40,
     width: 24,
+    aspectRatio: "506 / 425",
   },
   {
     id: "thar",
     title: "Visual media and motion concepts",
     category: "3d design",
     href: "/projects/brand-media",
-    image: "/assets/image/Main.png",
-    x: 71,
-    y: 55,
+    image: "/assets/image/COLLECTIONS.png",
+    x: 65,
+    y: 40,
     width: 24,
+    aspectRatio: "1283 / 853",
   },
 ];
 
@@ -143,13 +150,16 @@ function FloatingCard({
           }}
           className="relative group"
         >
-          {/* Image container with curved corners and hover glow */}
-          <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#0E293E] border border-white/10 shadow-lg transition-all duration-300 group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.25)]">
+          {/* Image container with hover glow */}
+          <div
+            className="relative transition-all duration-300 group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+            style={{ aspectRatio: project.aspectRatio || "4/3" }}
+          >
             <Image
               src={project.image}
               alt={project.title}
               fill
-              className="object-cover object-top rounded-xl"
+              className="object-contain"
               sizes="(max-width: 768px) 50vw, 25vw"
             />
             {/* Spotlight overlay: removed when not hovering, only shown on hover */}
@@ -180,7 +190,7 @@ export function FloatingProjects() {
   return (
     <section
       id="projects"
-      className="bg-[#071D2D] py-20 md:py-28 px-4 sm:px-6 md:px-8 text-white relative"
+      className="bg-[#071D2D] py-0 md:py-8 px-4 sm:px-6 md:px-8 text-white relative"
     >
       <div id="work" className="absolute -top-24" />
 
@@ -212,7 +222,7 @@ export function FloatingProjects() {
         <div className="hidden md:block">
           <div
             className="relative"
-            style={{ height: "580px" }}
+            style={{ height: "800px" }}
             onMouseLeave={() => setHoveredId(null)}
           >
             {FLOATING_PROJECTS.map((project) => (
@@ -251,12 +261,15 @@ export function FloatingProjects() {
                     className="relative group"
                   >
                     {/* Image */}
-                    <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#0E293E] border border-white/10 shadow-md transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                    <div
+                      className="relative transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                      style={{ aspectRatio: project.aspectRatio || "4/3" }}
+                    >
                       <Image
                         src={project.image}
                         alt={project.title}
                         fill
-                        className="object-cover object-top rounded-xl"
+                        className="object-contain"
                         sizes="50vw"
                       />
                       {/* Spotlight overlay: removed when not hovering, only shown on hover */}

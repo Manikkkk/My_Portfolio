@@ -163,7 +163,7 @@ export function Hero() {
             </div>
 
             {/* SMOOTH RANDOM 360-DEGREE FLOATING TECH STACK BADGES */}
-            {activeBadges.map((badge) => (
+            {/* {activeBadges.map((badge) => (
               <div
                 key={badge.id}
                 style={{
@@ -182,7 +182,7 @@ export function Hero() {
                 {badge.tool.icon}
                 <span>{badge.tool.name}</span>
               </div>
-            ))}
+            ))} */}
 
           </div>
         </div>
